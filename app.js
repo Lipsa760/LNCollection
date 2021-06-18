@@ -7,7 +7,7 @@ const bodyParser =require( "body-parser");
 const _ =require( "lodash");
 const mongoose =require( "mongoose");
 const ejs =require( "ejs");
-var session = require('cookie-session');
+const session =require( "express-session");
 const passport =require( "passport");
 const passportLocalMongoose =require( "passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -26,15 +26,11 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-  app.use(session({
-    cookie:{
-        secure: true,
-        maxAge:60000
-           },
-    secret: '"our little secret"',
-    saveUninitialized: true,
-    resave: false
-    }));
+app.use(session({
+    secret:"our little secret",
+    resave:false,
+    saveUninitialized:false
+  }));
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -94,7 +90,7 @@ passport.serializeUser(function(user, done) {
 ));
 
 passport.use(new FacebookStrategy({
-  clientID:process.env.CLIENT_ID_FB,
+    clientID:process.env.CLIENT_ID_FB,
     clientSecret:process.env.CLIENT_SECRET_FB,
     callbackURL: "http://localhost:3000/auth/facebook/product"
   },
@@ -528,7 +524,7 @@ app.get("/vieworder",(req,res)=>{
    brand:productData[orderId].brand,
    name:productData[orderId].name,
    price:productData[orderId].price
-  })
+  }) 
 
    Vieworder.findOneAndReplace({id:order_id},function(err,result){
      if(err){
@@ -634,10 +630,6 @@ app.get("/denver",function(req,res){
     res.redirect("/");
   })
 
-  let port = process.env.PORT;
-  if (port == null || port == "") {
-    port = 8000;
-  }
-  app.listen(port,()=>{
-    console.log('App running on port ${port}...');
-  });
+app.listen(3000,function (){
+    console.log("This server runs at port 3000");
+})
