@@ -7,7 +7,7 @@ const bodyParser =require( "body-parser");
 const _ =require( "lodash");
 const mongoose =require( "mongoose");
 const ejs =require( "ejs");
-const session =require( "express-session");
+var session = require('cookie-session');
 const passport =require( "passport");
 const passportLocalMongoose =require( "passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -26,11 +26,15 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-app.use(session({
-    secret:"our little secret",
-    resave:false,
-    saveUninitialized:false
-  }));
+  app.use(session({
+    cookie:{
+        secure: true,
+        maxAge:60000
+           },
+    secret: '"our little secret"',
+    saveUninitialized: true,
+    resave: false
+    }));
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -90,7 +94,7 @@ passport.serializeUser(function(user, done) {
 ));
 
 passport.use(new FacebookStrategy({
-    clientID:process.env.CLIENT_ID_FB,
+  clientID:process.env.CLIENT_ID_FB,
     clientSecret:process.env.CLIENT_SECRET_FB,
     callbackURL: "http://localhost:3000/auth/facebook/product"
   },
